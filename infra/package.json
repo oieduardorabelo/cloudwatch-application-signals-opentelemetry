@@ -1,0 +1,14 @@
+{
+    "name": "infra",
+    "type": "module",
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "toml": "^3.0.0",
+        "ts-dotenv": "^0.9.1"
+    }
+}

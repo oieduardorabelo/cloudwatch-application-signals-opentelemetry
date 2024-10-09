@@ -1,0 +1,12 @@
+# all projects
+__pycache__
+!**/.sst/stage
+.env
+.venv
+*.egg-info
+*.pyi
+**/.sst/*
+sst-env.d.ts
+
+# infra/
+node_modules
