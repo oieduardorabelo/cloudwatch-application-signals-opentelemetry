@@ -9,6 +9,7 @@ async def get_psql_conn():
         database=env.PSQL_DATABASE,
         host=env.PSQL_HOST,
         password=env.PSQL_PASSWORD,
+        port=env.PSQL_PORT,
         user=env.PSQL_USER,
     )
     try:

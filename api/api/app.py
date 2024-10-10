@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from uuid import UUID, uuid4
 
-from asgi_correlation_id import CorrelationIdMiddleware
+from asgi_correlation_id import CorrelationIdMiddleware, correlation_id
 from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi import status as fastapi_status
 from fastapi.middleware import Middleware
@@ -15,6 +15,7 @@ from api.dependencies import (
     ItemModel,
     PaginatedResponse,
     PostItemsRequest,
+    get_aiobotocore_session,
     random_sleep,
 )
 
@@ -40,11 +41,29 @@ app = FastAPI(
 )
 
 
+@app.get("/")
+async def read_root(
+    psql_conn=Depends(get_psql_conn),
+):
+    await psql_conn.execute("""
+        DROP TABLE items;
+        CREATE TABLE IF NOT EXISTS items (
+            id UUID PRIMARY KEY,
+            name VARCHAR,
+            description VARCHAR,
+            created_at TIMESTAMP WITH TIME ZONE,
+            updated_at TIMESTAMP WITH TIME ZONE
+        );
+    """)
+    return {"message": "table items created"}
+
+
 @app.post("/items/")
 async def post_items(
     item: PostItemsRequest | None = None,
     sleep: bool = True,
     psql_conn=Depends(get_psql_conn),
+    aiobotocore=Depends(get_aiobotocore_session),
 ):
     if sleep:
         await random_sleep()
@@ -71,6 +90,18 @@ async def post_items(
         new_item.updated_at,
     )
     logger.info("new_value", extra={"new_value": new_value})
+
+    async with aiobotocore.create_client("sqs") as sqs:
+        await sqs.send_message(
+            QueueUrl=env.QUEUE_ARCHIVE_URL,
+            MessageBody=new_item.model_dump_json(),
+            MessageAttributes={
+                "x-request-id": {
+                    "StringValue": correlation_id.get(),
+                    "DataType": "String",
+                },
+            },
+        )
 
     return new_value[0]
 

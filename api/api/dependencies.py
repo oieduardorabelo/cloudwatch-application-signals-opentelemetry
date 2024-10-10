@@ -4,12 +4,17 @@ from datetime import datetime
 from typing import List
 from uuid import UUID
 
+import aiobotocore.session
 from faker import Faker
 from pydantic import BaseModel, Field
 
 from api.config.settings import logger
 
 fake = Faker()
+
+
+async def get_aiobotocore_session():
+    return aiobotocore.session.get_session()
 
 
 async def random_sleep():

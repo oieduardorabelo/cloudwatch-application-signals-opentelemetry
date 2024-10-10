@@ -24,7 +24,10 @@ class Env(BaseSettings):
     PSQL_DATABASE: str = Field(default=None)
     PSQL_HOST: str = Field(default=None)
     PSQL_PASSWORD: str = Field(default=None)
+    PSQL_PORT: str = Field(default=None)
     PSQL_USER: str = Field(default=None)
+
+    QUEUE_ARCHIVE_URL: str = Field(default=None)
 
     @property
     def is_development(self):

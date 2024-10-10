@@ -1,0 +1,11 @@
+{
+  "name": "archive-to-s3",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/aws-lambda": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}
